@@ -1,0 +1,32 @@
+---
+resources:
+  - name: ckb-resource
+    type: git
+    source:
+      uri: https://github.com/starkandwayne/concourse-tutorial.git
+      branch: develop
+  - name: concourse_ci
+    type: git
+    source:
+      uri: https://github.com/liya2017/concourse_ci.git
+      branch: main
+
+jobs:
+  - name: job-develop
+    public: true
+    plan:
+      - get: ckb-resource
+        trigger: true
+      - get: concourse_ci
+        trigger: true
+      - task: job-develop
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox }
+          inputs:
+            - name: ckb-resource
+            - name: concourse_ci
+          run:
+            path: script/task_run_tests.sh
